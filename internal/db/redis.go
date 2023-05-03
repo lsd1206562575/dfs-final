@@ -1,4 +1,4 @@
-package redis
+package db
 
 import (
 	"time"
@@ -8,7 +8,7 @@ import (
 
 var (
 	pool      *redis.Pool
-	redisHost = "192.168.246.100:6379"
+	redisHost = "34.150.221.87:6379"
 )
 
 func newRedisPool() *redis.Pool {

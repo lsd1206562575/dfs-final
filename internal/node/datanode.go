@@ -25,7 +25,7 @@ func (d *DataNode) Done() bool {
 func (d *DataNode) server() {
 	rpc.Register(d)
 	rpc.HandleHTTP()
-	l, e := net.Listen("tcp", ":8080")
+	l, e := net.Listen("tcp", ":9000")
 	// os.Remove("dfs-datanode-socket")
 	//l, e := net.Listen("unix", "dfs-datanode-socket")
 	if e != nil {
@@ -54,6 +54,6 @@ func (d *DataNode) UploadFileToSftp(args *dfs_rpc.UploadArgs, reply *dfs_rpc.Upl
 	}
 
 	//base := filepath.Base(args.FilePath)
-	sftpUtil.UploadFile(client, args.FilePath, "/upload")
+	sftpUtil.UploadFile(client, args.FileBlockPath, "/upload")
 	return nil
 }
