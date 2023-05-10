@@ -9,6 +9,7 @@ import (
 	"net/rpc"
 	"os"
 	"path/filepath"
+	"strconv"
 	"time"
 
 	"dfs/internal/meta"
@@ -94,21 +95,25 @@ func MakeClient(filename string, method string) *Client {
 
 		// 3. 将文件进行分片，并放入队列中，并将文件写入到分配的datanode中，完成后，往 namenode发送一条请求，往redis中写入数据
 		fileBlockPaths := splitFile(filename)
+		//IPAddress := util.ReadFromUtil()
 
 		//远程调用datanode的上传，将分片文件上传至sftp服务器
 		for _, fileblockPath := range fileBlockPaths{
-			
-			args := dfs_rpc.UploadArgs{
-				FileBlockPath: fileblockPath,
-				IPAddr: "35.236.240.242",
-				Port: 2021,
-				User: "admin",
-				Password: "admin",
-				FileSha1: fileSha1,
-				Replica: 1,
+			for j := 0; j < 3; j++ {
+				
+			// 	//TODO:怎么去ip地址，保证是分块是相对散列的
+				port := 2021 + j;
+
+				// 块分发
+				args := dfs_rpc.UploadArgs{
+					FileBlockPath: fileblockPath,
+					FileSha1: fileSha1,
+					Replica: j+1,
+					SftpIpAdr: "192.168.246.100:"+strconv.Itoa(port), 
+				}
+				reply := dfs_rpc.UploadReply{}
+				dfs_rpc.UploadFileToSftp(&args, &reply)
 			}
-			reply := dfs_rpc.UploadReply{}
-			dfs_rpc.UploadFileToSftp(&args, &reply)
 		}
 		
 		// 4. 通知 namenode client即将退出

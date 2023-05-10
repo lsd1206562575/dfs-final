@@ -5,18 +5,18 @@ import (
 	"log"
 	"net/rpc"
 	"path/filepath"
-	"strconv"
 )
 
 func UploadFileToSftp(args *UploadArgs, reply *UploadReply){
 	callDataNode("DataNode.UploadFileToSftp", &args, &reply)
 	log.Printf("File: %s , Upload Success!", args.FileBlockPath)
 
+	// 给namenode发一个请求
 	metaDataArgs := UpdateMetaArgs {
 		FileSha1:	args.FileSha1,
 		FileName:  filepath.Base(args.FileBlockPath),
-		Replica:   1,
-		SftpIpAdr: args.IPAddr +":"+ strconv.Itoa(args.Port),
+		Replica:   args.Replica,
+		SftpIpAdr: args.SftpIpAdr,
 	}
 
 	metaDataReply :=  MetaDataReply {}

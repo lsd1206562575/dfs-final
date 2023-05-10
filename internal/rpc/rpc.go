@@ -10,10 +10,7 @@ type ExampleReply struct {
 
 type UploadArgs struct {
 	FileBlockPath string
-	IPAddr        string
-	Port          int
-	User          string
-	Password      string
+	SftpIpAdr     string
 	FileSha1      string
 	Replica       int
 }

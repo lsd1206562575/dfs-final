@@ -1,7 +1,8 @@
-Server:
+Services:
   name: DFS
   server-address: 127.0.0.1
   port: 8080
+  profile: prod
 
   nameNode:
     servers:
@@ -39,4 +40,42 @@ Server:
       - ipaddr: 35.245.147.191
         port: 2022
       - ipaddr: 35.245.147.191
+        port: 2023
+
+Services:
+  name: DFS
+  server-address: 127.0.0.1
+  port: 8080
+  profile: dev
+
+  nameNode:
+    servers:
+      - server-name: 'NameNode1'
+        server-address: 127.0.0.1
+        port: 8090
+      - server-name: 'NameNode2'
+        server-address: 127.0.0.1
+        port: 8091
+
+  dataNode:
+    servers:
+      - server-name: 'DataNode1'
+        server-address: 127.0.0.1
+        port: 9000
+      - server-name: 'DataNode2'
+        server-address: 127.0.0.1
+        port: 9002
+
+  # 可以抄一下 redis的集群configuration
+  redis-config:
+    host: '192.168.246.100:6379'
+    auth: 123456
+
+  sftp-servers:
+    hosts:
+      - ipaddr: 192.168.246.100
+        port: 2021
+      - ipaddr: 192.168.246.100
+        port: 2022
+      - ipaddr: 192.168.246.100
         port: 2023

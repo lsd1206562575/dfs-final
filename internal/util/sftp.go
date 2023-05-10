@@ -6,11 +6,102 @@ import (
 	"log"
 	"os"
 	"path"
+	"sync"
 	"time"
 
 	"github.com/pkg/sftp"
 	"golang.org/x/crypto/ssh"
 )
+
+type SFTPConnectionPool struct {
+	conns chan *sftp.Client
+}
+
+func NewSFTPConnectionPool(capacity int, addr, user, password string) (*SFTPConnectionPool, error) {
+	conns := make(chan *sftp.Client, capacity)
+
+	for i := 0; i < capacity; i++ {
+		client, err := connectSFTP(addr, user, password)
+		if err != nil {
+			return nil, err
+		}
+		conns <- client
+	}
+
+	return &SFTPConnectionPool{conns: conns}, nil
+}
+
+func connectSFTP(addr, user, password string) (*sftp.Client, error) {
+	config := &ssh.ClientConfig{
+		User: user,
+		Auth: []ssh.AuthMethod{
+			ssh.Password(password),
+		},
+		HostKeyCallback: ssh.InsecureIgnoreHostKey(),
+	}
+
+	conn, err := ssh.Dial("tcp", addr, config)
+	if err != nil {
+		return nil, err
+	}
+
+	client, err := sftp.NewClient(conn)
+	if err != nil {
+		conn.Close()
+		return nil, err
+	}
+
+	return client, nil
+}
+
+func (cp *SFTPConnectionPool) Get() *sftp.Client {
+	return <-cp.conns
+}
+
+func (cp *SFTPConnectionPool) Put(client *sftp.Client) {
+	cp.conns <- client
+}
+
+func (cp *SFTPConnectionPool) Close() {
+	for i := 0; i < cap(cp.conns); i++ {
+		(<-cp.conns).Close()
+	}
+}
+
+type SFTPConnectionManager struct {
+	mu       sync.Mutex
+	pools    sync.Map
+	capacity int
+}
+
+func NewSFTPConnectionManager(capacity int) *SFTPConnectionManager {
+	return &SFTPConnectionManager{capacity: capacity}
+}
+
+func (cm *SFTPConnectionManager) GetPool(serverAddr, user, password string) (*SFTPConnectionPool, error) {
+	key := serverAddr + ":" + user + ":" + password
+	pool, ok := cm.pools.Load(key)
+	if ok {
+		return pool.(*SFTPConnectionPool), nil
+	}
+
+	cm.mu.Lock()
+	defer cm.mu.Unlock()
+
+	pool, ok = cm.pools.Load(key)
+	if ok {
+		return pool.(*SFTPConnectionPool), nil
+	}
+
+	newPool, err := NewSFTPConnectionPool(cm.capacity, serverAddr, user, password)
+	if err != nil {
+		return nil, err
+	}
+
+	cm.pools.Store(key, newPool)
+	return newPool, nil
+}
+
 
 func Connect(user, password, host string, port int) (*sftp.Client, error) {
 	var (
