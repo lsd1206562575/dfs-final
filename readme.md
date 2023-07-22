@@ -1,4 +1,4 @@
-# Distributed System
+# Distributed System - Large file distributed storage system
 
 ### 主要 main 函数都在 cmd/DBFS 下
 
