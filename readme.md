@@ -1,5 +1,7 @@
 # Distributed System - Large File Distributed Storage System
 
+The [link]([https://drive.google.com/drive/folders/1NjjSyvn2dLs7_yWIESPTeVHNM4oTj3CG?usp=sharing](https://drive.google.com/drive/folders/1PZZzg5v7j_IXsCzuKvT4Oj9ADcSfu8JK?usp=drive_link)) for Slides and demo video
+
 ### 主要 main 函数都在 cmd/DBFS 下
 
 需要运行三个组件：
