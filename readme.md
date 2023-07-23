@@ -1,6 +1,6 @@
 # Distributed System - Large File Distributed Storage System
 
-The [link](https://drive.google.com/drive/folders/1PZZzg5v7j_IXsCzuKvT4Oj9ADcSfu8JK?usp=drive_link) for Slides and demo video
+The [link](https://drive.google.com/drive/folders/1wStOGv5pMPkL_1N5MSL-LIxno6ez70h4?usp=drive_link) for Slides and demo video
 
 ### 主要 main 函数都在 cmd/DBFS 下
 
